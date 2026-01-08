@@ -1,0 +1,56 @@
+# ===============================
+# Dependencies
+# ===============================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+
+# ===============================
+# Environment files
+# ===============================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===============================
+# Build outputs
+# ===============================
+build/
+dist/
+coverage/
+
+# ===============================
+# Logs
+# ===============================
+logs
+*.log
+
+# ===============================
+# OS files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Editor / IDE
+# ===============================
+.vscode/
+.idea/
+*.swp
+
+# ===============================
+# Optional: frontend specific
+# ===============================
+netflix_ui/node_modules/
+netflix_ui/build/
+netflix_ui/dist/
+
+# ===============================
+# Optional: backend specific (future)
+# ===============================
+netflix_api/node_modules/
+netflix_api/dist/
