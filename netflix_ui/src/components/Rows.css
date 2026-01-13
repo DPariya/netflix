@@ -81,7 +81,11 @@
 
 .row__card.active .row__overlay {
   opacity: 1;
-  border-radius: 6px;
+  border-radius:0px 0px 6px 6px;
+  -webkit-border-radius:0px 0px 6px 6px;
+  -moz-border-radius:0px 0px 6px 6px;
+  -ms-border-radius:0px 0px 6px 6px;
+  -o-border-radius:0px 0px 6px 6px;
 }
 
 .keen-slider:not([data-keen-slider-disabled]) .keen-slider__slide {

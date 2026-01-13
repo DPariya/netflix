@@ -8,8 +8,8 @@ const API_KEY = process.env.REACT_APP_MOVIE_API_KEY;
 const Rows = ({ title, fetchUrl }) => {
   const [movies, setMovies] = useState([]);
   const [sliderRef] = useKeenSlider({
-    // loop: false,
-    // mode: "free-snap",
+    loop: false,
+    mode: "free-snap",
     slides: {
       perView: 8,
       spacing: 15,
@@ -65,6 +65,7 @@ const Rows = ({ title, fetchUrl }) => {
     hoverTimeoutRef.current = setTimeout(async () => {
       setHoveredId({ id: movieId, edge });
     }, 350);
+
     hoverTimer.current = setTimeout(async () => {
       try {
         const res = await axios.get(
@@ -75,7 +76,7 @@ const Rows = ({ title, fetchUrl }) => {
           (v) => v.site === "YouTube" && v.type === "Trailer"
         );
 
-        if (trailer) setTrailerKey(trailer.key);
+        if (trailer) setTrailerKey(trailer?.key || null);
       } catch {}
     }, 700); // Netflix-like delay
   };
