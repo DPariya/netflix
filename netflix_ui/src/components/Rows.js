@@ -31,9 +31,20 @@ const Rows = ({ title, fetchUrl }) => {
   const hoverTimeoutRef = useRef(null);
   const canHover = window.matchMedia("(hover: hover)").matches;
 
+  //to fetch video on hover
   const [trailerKey, setTrailerKey] = useState(null);
   const hoverTimer = useRef(null);
 
+  //to abort rapid hover api call
+  const trailerAbortRef = useRef(null);
+
+  //catch visible video in advance
+  const trailerCache = useRef(new Map());
+
+  //for video loading
+  const [iframeLoaded, setIframeLoaded] = useState(false);
+
+  //fetch banner video
   useEffect(() => {
     async function fetchMovies() {
       try {
@@ -51,14 +62,45 @@ const Rows = ({ title, fetchUrl }) => {
     // };
     fetchMovies();
   }, [fetchUrl]);
+
+  //fetch advance video
+  useEffect(() => {
+    const preloadTrailers = async () => {
+      const preloadCount = 4;
+      const initialMovies = movies.slice(0, preloadCount);
+
+      for (const movie of initialMovies) {
+        if (trailerCache.current.has(movie.id)) continue;
+
+        try {
+          const res = await axios.get(
+            `/movie/${movie.id}/videos?api_key=${API_KEY}`
+          );
+
+          const trailer = res.data.results.find(
+            (v) => v.site === "YouTube" && v.type === "Trailer"
+          );
+
+          if (trailer) {
+            trailerCache.current.set(movie.id, trailer.key);
+          }
+        } catch {}
+      }
+    };
+
+    if (movies.length) preloadTrailers();
+  }, [movies]);
+
   const handleMouseEnter = (movieId, e) => {
     if (!canHover) return;
     const card = e.currentTarget; // capture immediately
 
     if (!card) return;
+
     const rect = card.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     let edge = "center";
+
     if (rect.left < 80) edge = "left";
     else if (rect.right > viewportWidth - 80) edge = "right";
 
@@ -67,26 +109,71 @@ const Rows = ({ title, fetchUrl }) => {
     }, 350);
 
     hoverTimer.current = setTimeout(async () => {
+      // 1. CHECK CACHE FIRST
+      const cached = trailerCache.current.get(movieId);
+      if (cached) {
+        setTrailerKey(cached);
+        return;
+      }
+      // 2. cancel previous request
+      if (trailerAbortRef.current) {
+        trailerAbortRef.current.abort();
+      }
+
+      const controller = new AbortController();
+      trailerAbortRef.current = controller;
       try {
+        // 3. FETCH FROM API ONLY IF NOT CACHED
         const res = await axios.get(
-          `/movie/${movieId}/videos?api_key=${API_KEY}`
+          `/movie/${movieId}/videos?api_key=${API_KEY}`,
+          { signal: controller.signal }
         );
 
         const trailer = res.data.results.find(
           (v) => v.site === "YouTube" && v.type === "Trailer"
         );
 
-        if (trailer) setTrailerKey(trailer?.key || null);
-      } catch {}
+        if (trailer) {
+          trailerCache.current.set(movieId, trailer.key); // store in cache
+          setTrailerKey(trailer.key);
+        }
+      } catch (err) {
+        if (err.name !== "CanceledError") {
+          console.error(err);
+        }
+      }
     }, 700); // Netflix-like delay
   };
+  //keyboard navigation
+  const handleKeyDown = (e, index) => {
+    if (e.key === "ArrowRight") {
+      document.querySelectorAll(".row__card")[index + 1]?.focus();
+    }
 
+    if (e.key === "ArrowLeft") {
+      document.querySelectorAll(".row__card")[index - 1]?.focus();
+    }
+
+    if (e.key === "Enter") {
+      // open modal / play
+    }
+  };
+
+  //hover leave
   const handleMouseLeave = () => {
     if (!canHover) return;
+
     clearTimeout(hoverTimeoutRef.current);
     clearTimeout(hoverTimer.current);
+
+    if (trailerAbortRef.current) {
+      trailerAbortRef.current.abort();
+    }
+
     setHoveredId({ id: null, edge: "center" });
     setTrailerKey(null);
+
+    setIframeLoaded(false);
   };
   return (
     <>
@@ -105,11 +192,20 @@ const Rows = ({ title, fetchUrl }) => {
                     } edge-${hoveredId.edge}`}
                     onMouseEnter={(e) => handleMouseEnter(movie.id, e)}
                     onMouseLeave={handleMouseLeave}
+                    tabIndex={0}
+                    onFocus={() =>
+                      setHoveredId({ id: movie.id, edge: "center" })
+                    }
+                    onBlur={handleMouseLeave}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
                   >
                     <div className="row__media">
                       {hoveredId.id === movie.id && trailerKey ? (
                         <iframe
-                          className="row__trailer"
+                          className={`row__trailer ${
+                            iframeLoaded ? "loaded" : ""
+                          }`}
+                          onLoad={() => setIframeLoaded(true)}
                           src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&playsinline=1`}
                           allow="autoplay"
                           title="trailer"

@@ -159,5 +159,16 @@
   height: 100%;
   border: none;
   border-radius: 6px;
+  opacity: 0;
+  transition: opacity 250ms ease-out;
+}
+.row__trailer.loaded {
+  opacity: 1;
+}
+@media (hover: none) {
+  .row__overlay,
+  .row__trailer {
+    display: none;
+  }
 }
 
