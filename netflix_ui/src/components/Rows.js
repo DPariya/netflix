@@ -3,9 +3,13 @@ import axios from "../axios.js";
 import "./Rows.css";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
+import { useInView } from "./UseInView.js";
+import { useTrailerCache } from "../utility/context/TrailerCacheContext.js";
 const API_KEY = process.env.REACT_APP_MOVIE_API_KEY;
 
 const Rows = ({ title, fetchUrl }) => {
+  const [rowRef, isVisible] = useInView();
+  const { getTrailer, setTrailer } = useTrailerCache();
   const [movies, setMovies] = useState([]);
   const [sliderRef] = useKeenSlider({
     loop: false,
@@ -44,7 +48,7 @@ const Rows = ({ title, fetchUrl }) => {
   //for video loading
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
-  //fetch banner video
+  //fetch video/images
   useEffect(() => {
     async function fetchMovies() {
       try {
@@ -110,8 +114,9 @@ const Rows = ({ title, fetchUrl }) => {
 
     hoverTimer.current = setTimeout(async () => {
       // 1. CHECK CACHE FIRST
-      const cached = trailerCache.current.get(movieId);
+      const cached = getTrailer(movieId);
       if (cached) {
+        console.log(cached);
         setTrailerKey(cached);
         return;
       }
@@ -177,73 +182,80 @@ const Rows = ({ title, fetchUrl }) => {
   };
   return (
     <>
-      <div className="row">
+      <div className="row" ref={rowRef}>
         <h2>{title}</h2>
-
-        <div ref={sliderRef} className="keen-slider row__slider">
-          {movies
-            ?.filter((movie) => movie.poster_path || movie?.backdrop_path)
-            .map((movie, index) => {
-              return (
-                <div key={movie.id} className="keen-slider__slide row__slide">
-                  <div
-                    className={`row__card ${
-                      hoveredId.id === movie.id ? "active" : ""
-                    } edge-${hoveredId.edge}`}
-                    onMouseEnter={(e) => handleMouseEnter(movie.id, e)}
-                    onMouseLeave={handleMouseLeave}
-                    tabIndex={0}
-                    onFocus={() =>
-                      setHoveredId({ id: movie.id, edge: "center" })
-                    }
-                    onBlur={handleMouseLeave}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                  >
-                    <div className="row__media">
-                      {hoveredId.id === movie.id && trailerKey ? (
-                        <iframe
-                          className={`row__trailer ${
-                            iframeLoaded ? "loaded" : ""
-                          }`}
-                          onLoad={() => setIframeLoaded(true)}
-                          src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&playsinline=1`}
-                          allow="autoplay"
-                          title="trailer"
-                        />
-                      ) : (
-                        <img
-                          src={
-                            hoveredId.id === movie.id
-                              ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
-                              : `https://image.tmdb.org/t/p/w300${movie.poster_path}`
-                          }
-                          loading="lazy"
-                          className="row__poster hover"
-                          alt={movie?.name || null}
-                          onError={(e) => {
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div className="row__overlay">
-                      <div className="row__info">
-                        {/* <div className="row__overlay"> */}
-                        <div className="row__actions">
-                          <button className="row__btn">▶</button>
-                          <button className="row__btn secondary">ℹ</button>
+        {isVisible ? (
+          <div ref={sliderRef} className="keen-slider row__slider">
+            {movies
+              ?.filter((movie) => movie.poster_path || movie?.backdrop_path)
+              .map((movie, index) => {
+                return (
+                  <div key={movie.id} className="keen-slider__slide row__slide">
+                    <div
+                      className={`row__card ${
+                        hoveredId.id === movie.id ? "active" : ""
+                      } edge-${hoveredId.edge}`}
+                      onMouseEnter={(e) => handleMouseEnter(movie.id, e)}
+                      onMouseLeave={handleMouseLeave}
+                      tabIndex={0}
+                      onFocus={() =>
+                        setHoveredId({ id: movie.id, edge: "center" })
+                      }
+                      onBlur={handleMouseLeave}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                    >
+                      <div className="row__media">
+                        {hoveredId.id === movie.id && trailerKey ? (
+                          <iframe
+                            className={`row__trailer ${
+                              iframeLoaded ? "loaded" : ""
+                            }`}
+                            onLoad={() => setIframeLoaded(true)}
+                            src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&playsinline=1`}
+                            allow="autoplay"
+                            title="trailer"
+                          />
+                        ) : (
+                          <img
+                            src={
+                              hoveredId.id === movie.id
+                                ? `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`
+                                : `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+                            }
+                            loading="lazy"
+                            className="row__poster hover"
+                            alt={movie?.name || null}
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div className="row__overlay">
+                        <div className="row__info">
+                          {/* <div className="row__overlay"> */}
+                          <div className="row__actions">
+                            <button className="row__btn">▶</button>
+                            <button className="row__btn secondary">ℹ</button>
+                          </div>
+                          <p className="row__title">
+                            {movie.title || movie.name}
+                          </p>
+                          {/* </div> */}
                         </div>
-                        <p className="row__title">
-                          {movie.title || movie.name}
-                        </p>
-                        {/* </div> */}
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-        </div>
+                );
+              })}
+          </div>
+        ) : (
+          <div className="row__skeleton">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="row__skeleton-card" />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
