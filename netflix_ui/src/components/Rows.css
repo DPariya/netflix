@@ -1,0 +1,159 @@
+.row {
+  position: relative;
+  top: -120px;
+  z-index: 2;
+  margin-left: 3rem;
+  margin-bottom: 40px;
+}
+
+.row h2 {
+  color: #e5e5e5;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+}
+
+/* SLIDER */
+
+.row__slider {
+  overflow-x: auto;
+  overflow-y: visible;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2% 0 2% 0; 
+}
+.row__slider::-webkit-scrollbar {
+  display: none;
+}
+
+/* SLIDE */
+.row__slide {
+  flex: 0 0 auto;
+  /* width: 160px;              Netflix poster width */
+  margin-right: 10px;
+      min-width: 108.983px;
+    max-width: 157.983px;
+}
+
+/* POSTER */
+.row__poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
+  -o-border-radius: 6px;
+}
+
+/* .row__poster:hover {
+  transform: scale(1.12) translateY(-8px);
+  z-index: 10;
+} */
+.row__card {
+  width: 160px;
+  height: 240px;
+  transition: transform 0.35s ease, width 0.35s ease;
+  transform-origin: center bottom;
+}
+
+.row__card.active {
+  width: 320px;
+  transform: translate(-80px, -24px); /* ⬅️ KEY FIX */
+  z-index: 50;
+  height: 230px;
+}
+
+
+.row__overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: #181818;
+  padding: 5px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  bottom: -54px;
+  z-index: 22;
+}
+
+.row__card.active .row__overlay {
+  opacity: 1;
+  border-radius: 6px;
+}
+
+.keen-slider:not([data-keen-slider-disabled]) .keen-slider__slide {
+  overflow: visible !important;
+}
+.row__card.edge-left.active {
+  transform: translate(0, -24px);
+}
+.row__card.edge-right.active {
+  transform: translate(-160px, -24px);
+}
+
+.row__meta {
+  font-size: 12px;
+  color: #b3b3b3;
+  margin-top: 6px;
+}
+
+.row__genres {
+  font-size: 12px;
+  color: #b3b3b3;
+}
+.row__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.row__btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  color: black;
+  font-size: 16px;
+}
+
+.row__btn.secondary {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.row__media {
+  /* height: 55%; */
+}
+
+.row__info {
+  height: 45%;
+  background: #181818;
+  padding: 8px 0px 0px 7px;
+}
+
+@media (hover: none) {
+  .row__card {
+    transform: none !important;
+  }
+
+  .row__overlay {
+    opacity: 0 !important;
+  }
+}
+.row__trailer {
+
+  z-index: 20;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 6px;
+}
+

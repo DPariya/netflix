@@ -3,6 +3,7 @@
   height: 100vh;
   color: white;
   overflow: hidden;
+  z-index: 1;
 }
 
 .banner__video {
