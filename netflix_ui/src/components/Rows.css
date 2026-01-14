@@ -1,3 +1,4 @@
+/* ========== ROW CONTAINER ========== */
 .row {
   position: relative;
   top: -120px;
@@ -13,215 +14,299 @@
   margin-bottom: 12px;
 }
 
-/* SLIDER */
-
+/* ========== SLIDER ========== */
 .row__slider {
   overflow-x: auto;
   overflow-y: visible;
-
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 2% 0 2% 0; 
+  padding: 60px 0 120px 0;
+  margin: -60px 0 -120px 0;
 }
+
 .row__slider::-webkit-scrollbar {
   display: none;
 }
 
-/* SLIDE */
+/* ========== SLIDE CONTAINER ========== */
 .row__slide {
   flex: 0 0 auto;
-  /* width: 160px;              Netflix poster width */
   margin-right: 10px;
-      min-width: 108.983px;
-    max-width: 157.983px;
+  min-width: 108px;
+  max-width: 160px;
+  position: relative;
+  z-index: 1;
+  overflow: visible !important;
 }
 
-/* POSTER */
-.row__poster {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 6px;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  -ms-border-radius: 6px;
-  -o-border-radius: 6px;
+/* Elevate slide when card is active */
+.row__slide:has(.row__card.active),
+.row__slide.slide-active {
+  z-index: 999 !important;
 }
 
-/* .row__poster:hover {
-  transform: scale(1.12) translateY(-8px);
-  z-index: 10;
-} */
+/* ========== CARD ========== */
 .row__card {
   width: 160px;
   height: 240px;
-  transition: transform 0.35s ease, width 0.35s ease;
+  position: relative;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #181818;
+  pointer-events: auto;
+  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1), box-shadow 0.35s ease;
   transform-origin: center bottom;
+}
+
+.row__card:focus {
+  outline: 2px solid #e50914;
+  outline-offset: 4px;
+}
+
+.row__card:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .row__card.active {
   width: 320px;
-  transform: translate(-80px, -24px); /* ⬅️ KEY FIX */
-  z-index: 50;
   height: 230px;
+  transform: translate(-80px, -24px);
+  z-index: 1000;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
-
-.row__overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  background: #181818;
-  padding: 5px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  bottom: -54px;
-  z-index: 22;
-}
-
-.row__card.active .row__overlay {
-  opacity: 1;
-  border-radius:0px 0px 6px 6px;
-  -webkit-border-radius:0px 0px 6px 6px;
-  -moz-border-radius:0px 0px 6px 6px;
-  -ms-border-radius:0px 0px 6px 6px;
-  -o-border-radius:0px 0px 6px 6px;
-}
-
-.keen-slider:not([data-keen-slider-disabled]) .keen-slider__slide {
-  overflow: visible !important;
-}
 .row__card.edge-left.active {
   transform: translate(0, -24px);
 }
+
 .row__card.edge-right.active {
   transform: translate(-160px, -24px);
 }
 
-.row__meta {
-  font-size: 12px;
-  color: #b3b3b3;
-  margin-top: 6px;
-}
-
-.row__genres {
-  font-size: 12px;
-  color: #b3b3b3;
-}
-.row__actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.row__btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: white;
-  color: black;
-  font-size: 16px;
-}
-
-.row__btn.secondary {
-  background: rgba(255,255,255,0.2);
-  color: white;
-}
-
+/* ========== MEDIA CONTAINER ========== */
 .row__media {
-  /* height: 55%; */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 6px;
 }
 
-.row__info {
-  height: 45%;
-  background: #181818;
-  padding: 8px 0px 0px 7px;
+.row__card.active .row__media {
+  height: auto;
+  aspect-ratio: 16/9;
+  border-radius: 6px 6px 0 0;
 }
 
-@media (hover: none) {
-  .row__card {
-    transform: none !important;
-  }
-
-  .row__overlay {
-    opacity: 0 !important;
-  }
+/* ========== POSTER ========== */
+.row__poster {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  transition: opacity 0.3s ease;
 }
+
+.row__card.active .row__poster {
+  border-radius: 6px 6px 0 0;
+}
+
+.row__poster.hidden {
+  opacity: 0;
+}
+
+/* ========== TRAILER ========== */
 .row__trailer {
-
-  z-index: 20;
-  pointer-events: none;
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 6px;
+  border-radius: 6px 6px 0 0;
   opacity: 0;
-  transition: opacity 250ms ease-out;
+  z-index: 20;
+  pointer-events: none;
+  transition: opacity 0.4s ease-out;
 }
+
 .row__trailer.loaded {
   opacity: 1;
 }
-@media (hover: none) {
-  .row__overlay,
-  .row__trailer {
-    display: none;
-  }
+
+/* ========== OVERLAY ========== */
+.row__overlay {
+  position: absolute;
+  bottom: -54px;
+  left: 0;
+  width: 100%;
+  background: #181818;
+  padding: 5px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  border-radius: 0 0 6px 6px;
+  z-index: 22;
 }
 
-.row__skeleton {
-  height: 240px;              /* same as poster height */
-  margin-left: 3rem;
-  margin-bottom: 40px;
+.row__card.active .row__overlay {
+  opacity: 1;
+  visibility: visible;
+}
 
+/* ========== INFO SECTION ========== */
+.row__info {
+  background: #181818;
+  padding: 8px 7px 0;
+}
+
+.row__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  margin: 8px 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__meta {
+  font-size: 12px;
+  color: #b3b3b3;
+  margin: 4px 0 0;
+}
+
+.row__rating {
+  color: #46d369;
+  font-weight: 500;
+}
+
+/* ========== ACTION BUTTONS ========== */
+.row__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row__btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.row__btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: white;
+  transform: scale(1.1);
+}
+
+.row__btn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.row__btn.primary {
+  background: white;
+  color: black;
+  border-color: white;
+}
+
+.row__btn.primary:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.row__btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.row__btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  color: #46d369;
+}
+
+/* ========== KEEN SLIDER OVERRIDE ========== */
+.keen-slider:not([data-keen-slider-disabled]) .keen-slider__slide {
+  overflow: visible !important;
+}
+
+.keen-slider {
+  overflow: visible !important;
+}
+
+/* ========== ERROR STATE ========== */
+.row__error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 240px;
+  color: #b3b3b3;
+  font-size: 14px;
+}
+
+/* ========== SKELETON LOADING ========== */
+.row__skeleton {
+  height: 240px;
   display: flex;
   gap: 15px;
   overflow: hidden;
 }
-.row__skeleton::before {
-  content: "";
-  display: flex;
-  gap: 15px;
 
-  width: 100%;
-  height: 100%;
-}
-.row__skeleton::after {
-  content: "";
-  display: block;
-}
-.row__skeleton-card::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -150px;
-  height: 100%;
-  width: 150px;
-
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.08),
-    transparent
-  );
-
-  animation: shimmer 1.4s infinite;
+.row__skeleton-card {
+  flex: 0 0 160px;
+  height: 240px;
+  background: linear-gradient(110deg, #1a1a1a 8%, #2a2a2a 18%, #1a1a1a 33%);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 @keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
   100% {
-    transform: translateX(300px);
+    background-position: -200% 0;
   }
 }
+
+/* ========== TOUCH DEVICES ========== */
+@media (hover: none) {
+  .row__card {
+    transform: none !important;
+  }
+
+  .row__overlay,
+  .row__trailer {
+    display: none !important;
+  }
+
+  .row__slider {
+    padding: 2% 0;
+    margin: 0;
+  }
+}
+
+/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
-  .row__skeleton {
+  .row {
     margin-left: 1rem;
   }
 
   .row__skeleton-card {
+    flex: 0 0 120px;
+    height: 180px;
+  }
+
+  .row__card {
     width: 120px;
     height: 180px;
   }

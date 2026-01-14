@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Banner.css";
-import axios from "../axios.js";
-import request from "../request.js";
+import { axios } from "../api";
+import { requests } from "../api";
 const API_KEY = process.env.REACT_APP_MOVIE_API_KEY;
 
 const Banner = () => {
@@ -12,7 +12,7 @@ const Banner = () => {
     async function fetchData() {
       try {
         // 1. Get trending / netflix originals (from YOUR backend)
-        const res = await axios.get(request.fetchNetflixOriginals);
+        const res = await axios.get(requests.fetchNetflixOriginals);
         const bannerCandidates = res.data.results.filter(
           (item) => item.backdrop_path || item.poster_path
         );
