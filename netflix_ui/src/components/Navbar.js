@@ -7,14 +7,13 @@ const Navbar = () => {
   const [scroll, setScroll] = useState(false);
 
   useEffect(() => {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY > 100) {
-        setScroll(true);
-      } else setScroll(false);
-      return () => {
-        window.addEventListener("scroll", () => {});
-      };
-    });
+    const handleScroll = () => {
+      setScroll(window.scrollY);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
   return (
     <div className={`nav ${scroll && "nav_black"}`}>
