@@ -4,15 +4,14 @@ import axios from "axios";
  * Configured Axios instance for TMDB API
  *
  * Features:
- * - Base URL configuration
+ * - Point to backend
  * - Request timeout
- * - Automatic API key injection
  * - Response error handling
  * - Rate limit detection
  */
 
 const instance = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "https://api.themoviedb.org/3",
+  baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api",
   timeout: 10000, // 10 seconds
   headers: {
     "Content-Type": "application/json",
@@ -22,16 +21,6 @@ const instance = axios.create({
 // Request interceptor
 instance.interceptors.request.use(
   (config) => {
-    // Add API key to all requests if not already present
-    const apiKey = process.env.REACT_APP_MOVIE_API_KEY;
-
-    if (apiKey && !config.params?.api_key) {
-      config.params = {
-        ...config.params,
-        api_key: apiKey,
-      };
-    }
-
     // Add language parameter if not present
     if (!config.params?.language) {
       config.params = {
@@ -45,7 +34,7 @@ instance.interceptors.request.use(
   (error) => {
     console.error("Request error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor
@@ -60,7 +49,7 @@ instance.interceptors.response.use(
 
       switch (status) {
         case 401:
-          console.error("API Error: Invalid API key");
+          console.error("API Error: Unauthorized");
           break;
         case 404:
           console.error("API Error: Resource not found");
@@ -84,7 +73,7 @@ instance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default instance;

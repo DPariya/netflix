@@ -1,48 +1,47 @@
 /**
- * TMDB API Request Endpoints
+ * Backend API Request Endpoints
  *
- * Note: API key is now automatically added by axios interceptor,
- * so we don't need to include it in every URL.
+ * All requests now go through YOUR backend at /api/movies/*
+ * No direct TMDB calls, no API key needed in frontend!
  *
- * @see https://developers.themoviedb.org/3
  */
 
 const requests = {
   // Trending
-  fetchTrending: "/trending/all/week",
-  fetchTrendingMovies: "/trending/movie/week",
-  fetchTrendingTV: "/trending/tv/week",
+  fetchTrending: "/movies/trending",
+  fetchTrendingMovies: "/movies/trending/movies",
+  fetchTrendingTV: "/movies/trending/tv",
 
   // Movies by category
-  fetchTopRated: "/movie/top_rated",
-  fetchPopular: "/movie/popular",
-  fetchNowPlaying: "/movie/now_playing",
-  fetchUpcoming: "/movie/upcoming",
+  fetchTopRated: "/movies/top-rated",
+  fetchPopular: "/movies/popular",
+  fetchNowPlaying: "/movies/now-playing",
+  fetchUpcoming: "/movies/upcoming",
 
   // TV Shows
-  fetchNetflixOriginals: "/discover/tv?with_networks=213",
-  fetchPopularTV: "/tv/popular",
-  fetchTopRatedTV: "/tv/top_rated",
+  fetchNetflixOriginals: "/movies/originals",
+  fetchPopularTV: "/movies/tv/popular",
+  fetchTopRatedTV: "/movies/tv/top-rated",
 
-  // Movies by genre
-  fetchActionMovies: "/discover/movie?with_genres=28",
-  fetchAdventureMovies: "/discover/movie?with_genres=12",
-  fetchAnimationMovies: "/discover/movie?with_genres=16",
-  fetchComedyMovies: "/discover/movie?with_genres=35",
-  fetchCrimeMovies: "/discover/movie?with_genres=80",
-  fetchDocumentaries: "/discover/movie?with_genres=99",
-  fetchDramaMovies: "/discover/movie?with_genres=18",
-  fetchFamilyMovies: "/discover/movie?with_genres=10751",
-  fetchFantasyMovies: "/discover/movie?with_genres=14",
-  fetchHistoryMovies: "/discover/movie?with_genres=36",
-  fetchHorrorMovies: "/discover/movie?with_genres=27",
-  fetchMusicMovies: "/discover/movie?with_genres=10402",
-  fetchMysteryMovies: "/discover/movie?with_genres=9648",
-  fetchRomanceMovies: "/discover/movie?with_genres=10749",
-  fetchSciFiMovies: "/discover/movie?with_genres=878",
-  fetchThrillerMovies: "/discover/movie?with_genres=53",
-  fetchWarMovies: "/discover/movie?with_genres=10752",
-  fetchWesternMovies: "/discover/movie?with_genres=37",
+  // Movies by genre (using genre IDs)
+  fetchActionMovies: "/movies/genre/28",
+  fetchAdventureMovies: "/movies/genre/12",
+  fetchAnimationMovies: "/movies/genre/16",
+  fetchComedyMovies: "/movies/genre/35",
+  fetchCrimeMovies: "/movies/genre/80",
+  fetchDocumentaries: "/movies/genre/99",
+  fetchDramaMovies: "/movies/genre/18",
+  fetchFamilyMovies: "/movies/genre/10751",
+  fetchFantasyMovies: "/movies/genre/14",
+  fetchHistoryMovies: "/movies/genre/36",
+  fetchHorrorMovies: "/movies/genre/27",
+  fetchMusicMovies: "/movies/genre/10402",
+  fetchMysteryMovies: "/movies/genre/9648",
+  fetchRomanceMovies: "/movies/genre/10749",
+  fetchSciFiMovies: "/movies/genre/878",
+  fetchThrillerMovies: "/movies/genre/53",
+  fetchWarMovies: "/movies/genre/10752",
+  fetchWesternMovies: "/movies/genre/37",
 };
 
 // Genre IDs for reference
@@ -68,24 +67,24 @@ export const GENRES = {
   WESTERN: 37,
 };
 
-// Helper function to build custom discover URLs
-export const buildDiscoverUrl = (options = {}) => {
-  const params = new URLSearchParams();
+// Helper function to build genre URLs
+export const buildDiscoverUrl = (genreId) => {
+  return `/movies/genre/${genreId}`;
+};
 
-  if (options.genres) {
-    params.set("with_genres", options.genres.join(","));
-  }
-  if (options.year) {
-    params.set("primary_release_year", options.year);
-  }
-  if (options.sortBy) {
-    params.set("sort_by", options.sortBy);
-  }
-  if (options.voteAverage) {
-    params.set("vote_average.gte", options.voteAverage);
-  }
+// Helper for movie details
+export const getMovieDetailsUrl = (movieId) => {
+  return `/movies/${movieId}`;
+};
 
-  return `/discover/movie?${params.toString()}`;
+// Helper for trailer
+export const getTrailerUrl = (movieId) => {
+  return `/movies/${movieId}/trailer`;
+};
+
+// Helper for search
+export const getSearchUrl = (query, type = "multi") => {
+  return `/movies/search?q=${encodeURIComponent(query)}&type=${type}`;
 };
 
 export default requests;

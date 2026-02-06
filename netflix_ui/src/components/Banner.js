@@ -14,27 +14,38 @@ const Banner = () => {
         // 1. Get trending / netflix originals (from YOUR backend)
         const res = await axios.get(requests.fetchNetflixOriginals);
         const bannerCandidates = res.data.results.filter(
-          (item) => item.backdrop_path || item.poster_path
+          (item) => item.backdrop_path || item.poster_path,
         );
 
-        const randomMovieId =
+        const randomMovie =
           bannerCandidates[Math.floor(Math.random() * bannerCandidates.length)];
-        setMovie(randomMovieId || null);
+
+        setMovie(randomMovie);
 
         // 2. Fetch trailer
-        const endpoint =
-          randomMovieId.media_type === "tv"
-            ? `/tv/${randomMovieId.id}/videos?api_key=${API_KEY}`
-            : `/movie/${randomMovieId.id}/videos?api_key=${API_KEY}`;
+        // 2. Fetch trailer from YOUR backend
+        if (randomMovie?.id) {
+          try {
+            const videoRes = await axios.get(
+              `/movies/${randomMovie.id}/trailer`,
+            );
 
-        const videoRes = await axios.get(endpoint);
-        if (!Array.isArray(res.data.results)) return null;
-        // Correct array access
-        const trailer = videoRes?.data?.results?.find(
-          (v) => v.site === "YouTube" && v.type === "Trailer"
-        );
+            if (
+              videoRes?.data?.results &&
+              Array.isArray(videoRes.data.results)
+            ) {
+              const trailer = videoRes.data.results.find(
+                (v) => v.site === "YouTube" && v.type === "Trailer",
+              );
 
-        setVideoKey(trailer?.key || null);
+              if (trailer?.key) {
+                setVideoKey(trailer.key);
+              }
+            }
+          } catch (trailerErr) {
+            console.log("Trailer not available");
+          }
+        }
         return res;
       } catch (error) {
         console.error("Banner load failed", error);

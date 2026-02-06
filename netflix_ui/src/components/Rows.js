@@ -116,12 +116,12 @@ const Rows = ({ title, fetchUrl }) => {
 
       try {
         const { default: axios } = await import("../api/axios");
-        const res = await axios.get(`/movie/${movie.id}/videos`, {
+        const res = await axios.get(`/movies/${movie.id}/trailer`, {
           signal: trailerAbortRef.current.signal,
         });
 
         const trailer = res.data.results.find(
-          (v) => v.site === "YouTube" && v.type === "Trailer"
+          (v) => v.site === "YouTube" && v.type === "Trailer",
         );
 
         if (trailer) {
