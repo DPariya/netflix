@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-
+import connectDB from "./config/database.js";
 import routes from "./routes/index.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
@@ -12,6 +12,7 @@ const app = express();
  */
 app.use(cors());
 app.use(express.json());
+connectDB(); // connect Database
 
 /**
  * Health check
