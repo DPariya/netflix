@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import RefreshToken from "../models/RefreshToken.model";
+import RefreshToken from "../models/RefreshToken.model.js";
 import crypto from "crypto";
 
 //generate access token
@@ -11,7 +11,7 @@ export const generateAccessToken = (userId) => {
 //generate refresh token
 export const generateRefreshToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: process.env.JWT_REFRESH_SECRET || "7d",
+    expiresIn: process.env.JWT_REFRESH_EXPIRE || "7d",
   });
 };
 //verify Access token
@@ -34,6 +34,8 @@ export const verifyRefreshToken = (token) => {
 
 //save refresh token to database
 export const saveRefreshToken = async (userId, token, req) => {
+  const userAgent = req.headers["user-agent"] || "unknown";
+  const ipAddress = req.ip || req.connection?.remoteAddress;
   //calculate expiry date
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
@@ -43,8 +45,8 @@ export const saveRefreshToken = async (userId, token, req) => {
     token,
     user: userId,
     expiresAt,
-    createdByIp: req.ip || req.connection.remoteAddress,
-    userAgent: req.headers["user-agent"],
+    createdByIp: ipAddress || req.connection.remoteAddress,
+    userAgent,
   });
   return refreshToken;
 };
@@ -120,7 +122,7 @@ export const sendTokenResponse = async (user, req, res, statusCode = 200) => {
   const refreshToken = generateRefreshToken(user._id);
 
   //save refresh token in db
-  await saveRefreshToken(user._id, refreshToken, res);
+  await saveRefreshToken(user._id, refreshToken, req);
 
   //set refresh token in http request
   const cookieOptions = {
