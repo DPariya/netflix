@@ -50,7 +50,7 @@ const sendEmail = async (options) => {
  * Send password reset email
  * @param {Object} user - User object
  * @param {String} resetToken - Reset token
- *//
+ */
 export const sendPasswordResetEmail = async (user, resetToken) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
