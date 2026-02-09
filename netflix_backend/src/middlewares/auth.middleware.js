@@ -1,5 +1,5 @@
-import User from "../models/User.model";
-import { verifyAccessToken } from "../utils/jwt.utils";
+import User from "../models/User.model.js";
+import { verifyAccessToken } from "../utils/jwt.utils.js";
 
 //protected routes - verify jwt
 export const protect = async (req, res, next) => {

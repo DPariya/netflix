@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema(
       ],
     },
     password: {
+      type: String,
       required: [true, "Please provide a password"],
       minlength: [6, "Password must be at least 6 characters"],
       select: false,
@@ -29,28 +30,32 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    watchList: {
-      movieId: {
-        type: Number,
-        required: true,
+    watchList: [
+      {
+        movieId: {
+          type: Number,
+          required: true,
+        },
+        title: String,
+        poster: String,
+        addedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
-      title: String,
-      poster: String,
-      addedAt: {
-        type: Date,
-        default: Date.now,
+    ],
+    preference: [
+      {
+        language: {
+          type: String,
+          default: "en",
+        },
+        autoplayNext: {
+          type: Boolean,
+          default: true,
+        },
       },
-    },
-    preference: {
-      language: {
-        type: String,
-        default: "en",
-      },
-      autoplayNext: {
-        type: Boolean,
-        default: true,
-      },
-    },
+    ],
     lastLogin: {
       type: Date,
       default: Date.now,
@@ -66,18 +71,12 @@ userSchema.index({ email: 1 });
 userSchema.index({ "watchList.movieId": 1 });
 
 //password hashing before saving
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   //hash only if password modified
-  if (!this.isModified("password")) {
-    return next();
-  }
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  if (!this.isModified("password")) return;
+
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 //to compare password
